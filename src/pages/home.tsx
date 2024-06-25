@@ -1,21 +1,28 @@
-import { Link } from 'react-router-dom';
-
-import logo from '../logo.svg';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Profile } from '../types';
+import Card from '../components/profile-card';
 
 function Home() {
+  const [profiles, setProfiles] = useState<Profile[]>();
+
+  const getUser = async () => {
+    const { data } = await axios.get('/api/users');
+    setProfiles(data);
+  };
+
+  useEffect(() => {
+    try {
+      getUser();
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   return (
-    <header className="app-header">
-      <img src={logo} className="app-logo" alt="logo" />
-      <pre style={{ textAlign: 'left' }}>
-        <code>window.blocklet = {JSON.stringify(window.blocklet, null, 2)}</code>
-      </pre>
-      <Link className="app-link" to="/about">
-        About
-      </Link>
-      <a className="app-link" href="https://developer.blocklet.io/docs/" target="_blank" rel="noopener noreferrer">
-        Learn Blocklet
-      </a>
-    </header>
+    <div className="overflow-y-scroll max-h-screen">
+      {profiles?.map((item) => <Card profile={item} getUser={getUser} />)}
+    </div>
   );
 }
 
